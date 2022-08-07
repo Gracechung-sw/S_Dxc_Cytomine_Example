@@ -14,9 +14,7 @@
 
 FROM cytomine/software-python3-base
 
-# COPY requirements.txt requirements.txt
-# RUN pip install -r requirements.txt && rm requirements.txt
-
+ADD descriptor.json /app/descriptor.json
 ADD example.py /app/example.py
 ADD api.py /app/api.py
 
