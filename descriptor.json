@@ -1,6 +1,10 @@
 {
     "name": "Dxc_Cytomine_Example",
     "description": "This Cytomine App is a first test.",
+    "container-image": {
+        "image": "dockerdeepbiodev/s_dxc_cytomine_example",
+        "type": "singularity"
+    },
     "schema-version": "cytomine-0.1",
     "command-line": "python example.py --cytomine_host [CYTOMINE_HOST] --cytomine_public_key [CYTOMINE_PUBLIC_KEY] --cytomine_private_key [CYTOMINE_PRIVATE_KEY] --cytomine_id_project [CYTOMINE_ID_PROJECT] --cytomine_id_software [CYTOMINE_ID_SOFTWARE] --ai_model_type [ALPHA]",
     "inputs": [
