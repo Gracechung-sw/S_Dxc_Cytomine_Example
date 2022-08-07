@@ -1,23 +1,13 @@
 {
     "name": "Dxc_Cytomine_Example",
-    "description": "This Cytomine App is a first test.",
+    "description": "Deepbio Openapi algorithm",
     "container-image": {
         "image": "dockerdeepbiodev/s_dxc_cytomine_example",
         "type": "singularity"
     },
     "schema-version": "cytomine-0.1",
-    "command-line": "python example.py --cytomine_host [CYTOMINE_HOST] --cytomine_public_key [CYTOMINE_PUBLIC_KEY] --cytomine_private_key [CYTOMINE_PRIVATE_KEY] --cytomine_id_project [CYTOMINE_ID_PROJECT] --cytomine_id_software [CYTOMINE_ID_SOFTWARE] --ai_model_type [ALPHA]",
+    "command-line": "python example.py CYTOMINE_HOST CYTOMINE_PUBLIC_KEY CYTOMINE_PRIVATE_KEY CYTOMINE_ID_PROJECT CYTOMINE_ID_SOFTWARE AI_MODEL_TYPE",
     "inputs": [
-        {
-            "id": "ai_model_type",
-            "name": "AI model type",
-            "description": "model_type to anaysis",
-            "type": "String",
-            "optional": false,
-            "default-value": "PRAD_GLEASON_SCORE",
-            "value-key": "[@ID]",
-            "command-line-flag": "--@id"
-        },
         {
             "id": "cytomine_host",
             "name": "Cytomine host",
@@ -60,6 +50,16 @@
             "set-by-server": true,
             "optional": false,
             "type": "Number",
+            "value-key": "[@ID]",
+            "command-line-flag": "--@id"
+        },
+        {
+            "id": "ai_model_type",
+            "name": "AI model type",
+            "description": "Analysis Model type. ProstateResection_0 | ProstateTURP_0 | BreastLymphNode_0 | BreastResection_0",
+            "type": "String",
+            "optional": false,
+            "default-value": "PRAD_GLEASON_SCORE",
             "value-key": "[@ID]",
             "command-line-flag": "--@id"
         }
