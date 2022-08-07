@@ -25,10 +25,13 @@ def run(cyto_job, parameters):
     project_id = project.id
     # I create a working directory that I will delete at the end of this run
     working_path = os.path.join("tmp", str(job.id))
-    img_download_folder = os.path.join("/app/img", str(project_id))
+    img_download_folder = os.path.join("img", str(project_id))
     if not os.path.exists(working_path):
         logging.info("Creating working directory: %s", working_path)
         os.makedirs(working_path)
+    if not os.path.exists(img_download_folder):
+        logging.info("Creating img download directory: %s", img_download_folder)
+        os.makedirs(img_download_folder)
 
     try:
         ai_model_parameter = parameters.ai_model_type
