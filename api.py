@@ -43,14 +43,14 @@ def upload_file(file_path, url):
 
 
 #분석 시작 요청
-def start_analysis(source):
+def start_analysis(source, analysis_type):
     try:
         url = ANALYSIS_START_URL
         print(source)
         print(ANALYSIS_START_URL)
         res = requests.post(url=url, data={
             "source": source,
-            "type": "PRAD_GLEASON_SCORE"
+            "type": analysis_type
         })
         print(res.json())
         return res.json()["task_id"]

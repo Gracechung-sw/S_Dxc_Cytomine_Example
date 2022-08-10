@@ -65,7 +65,7 @@ def run(cyto_job, parameters):
             upload_file(file_path, upload_url)
             logging.info("upload finish")
 
-            task_id = start_analysis(object_id)
+            task_id = start_analysis(object_id, ai_model_parameter)
             logging.info("analysis start")
             
             image_str = f"{image_filie_name} ({i+1}/{nb_images})"
