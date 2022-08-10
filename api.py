@@ -2,13 +2,19 @@ import os
 import requests
 import json
 
-#openapi-test-env 프로젝트(테스트 프로젝트, visiopharm은 여기에 연결되어 있음)
-PREFIX = "https://test-endpoints-nlnvnjcdbq-uc.a.run.app/api/v1"
-RESUMABLE_UPLOAD_URL = f"{PREFIX}/images"
-ANALYSIS_START_URL = f"{PREFIX}/analyses"
-GET_ANALYSIS_STATUS_URL = f"{PREFIX}/analyses/status/"
-GET_ANALYSIS_RESULT_URL = f"{PREFIX}/analyses/result/"
+# openapi-test-env 프로젝트(테스트 프로젝트, visiopharm은 여기에 연결되어 있음)
+# PREFIX = "https://test-endpoints-nlnvnjcdbq-uc.a.run.app/api/v1"
+# RESUMABLE_UPLOAD_URL = f"{PREFIX}/images"
+# ANALYSIS_START_URL = f"{PREFIX}/analyses"
+# GET_ANALYSIS_STATUS_URL = f"{PREFIX}/analyses/status/"
+# GET_ANALYSIS_RESULT_URL = f"{PREFIX}/analyses/result/"
 
+# postgreSQL 사용하는 endpoint 함수에 임시로 연결하여 테스트 하기 위해 추가 
+PREFIX = "https://us-central1-openapi-test-env.cloudfunctions.net"
+RESUMABLE_UPLOAD_URL = f"{PREFIX}/upload"
+ANALYSIS_START_URL = f"{PREFIX}/analysis"
+GET_ANALYSIS_STATUS_URL = f"{PREFIX}/getStatusBySlideId?task_id="
+GET_ANALYSIS_RESULT_URL = f"{PREFIX}/getResultBySlideId?task_id="
 
 #업로드 URL 가져오기
 def get_upload_url(file_path):   
