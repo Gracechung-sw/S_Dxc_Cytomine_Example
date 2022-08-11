@@ -10,12 +10,16 @@ from shapely.geometry import Point, box
 
 import cytomine
 from cytomine.models import ImageInstance, ImageInstanceCollection, Job, JobData, Property, Annotation, AnnotationTerm, AnnotationCollection
-from cytomine.utilities.software import parse_domain_list
 from api import get_upload_url, start_analysis, upload_file, get_analysis_status, get_analysis_result
 
 SUCCESS_STATUS = ["FINISHED"]
 FAILED_STATUS = ["DOWNLOAD_FAILED", "FAILED"]
 
+
+def parse_domain_list(s):
+    if s is None or len(s) == 0:
+        return []
+    return list(map(int, s.split(',')))
 
 def run(cyto_job, parameters):
     logging.info("Entering run(cyto_job=%s, parameters=%s)", cyto_job, parameters)
