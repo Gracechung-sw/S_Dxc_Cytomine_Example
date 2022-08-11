@@ -10,7 +10,7 @@ from shapely.geometry import Point, box
 
 import cytomine
 from cytomine.models import ImageInstance, ImageInstanceCollection, Job, JobData, Property, Annotation, AnnotationTerm, AnnotationCollection
-
+from cytomine.utilities.software import parse_domain_list
 from api import get_upload_url, start_analysis, upload_file, get_analysis_status, get_analysis_result
 
 SUCCESS_STATUS = ["FINISHED"]
@@ -35,14 +35,17 @@ def run(cyto_job, parameters):
 
     try:
         ai_model_parameter = parameters.ai_model_type
+        images_to_analyze = parameters.cytomine_id_images
 
         logging.info("Display ai_model_parameter %s", ai_model_parameter)
 
-        # loop for images in the project
-        # Select images to process
-        # Get list of images im my project
-        
-        images = ImageInstanceCollection().fetch_with_filter("project", project_id)
+        # -- Select images to process or Get list of images in my project
+        images = ImageInstanceCollection()
+        if images_to_analyze is not None:
+            images_id = parse_domain_list(images_to_analyze)
+            images.extend([ImageInstance().fetch(_id) for _id in images_id])
+        else:
+            images = images.fetch_with_filter("project", project_id)
         nb_images = len(images)
         logging.info("# images in project: %d", nb_images)
 

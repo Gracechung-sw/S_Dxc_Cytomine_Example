@@ -1,0 +1,1 @@
+# Integration DeepDx™ HTTP API algorithm into Cytomine platform
