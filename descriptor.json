@@ -56,7 +56,7 @@
         {
             "id": "ai_model_type",
             "name": "AI model type",
-            "description": "Analysis Model type. ProstateNeedleBiopsy_0 | ProstateResection_0 | ProstateTURP_0 | BreastLymphNode_0 | BreastResection_0",
+            "description": "Analysis Model type is given by a value among 'ProstateNeedleBiopsy', 'ProstateResection', 'ProstateTURP', 'BreastLymphNode', 'BreastResection'.",
             "type": "String",
             "optional": false,
             "default-value": "ProstateNeedleBiopsy",
