@@ -74,5 +74,4 @@ def get_analysis_result(task_id):
     res.raise_for_status()
     result = res.json()["results"][0]
     result_str = json.dumps(result)
-    print(result_str)
     return result

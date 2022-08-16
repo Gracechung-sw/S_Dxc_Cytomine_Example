@@ -14,8 +14,20 @@
 
 FROM cytomine/software-python3-base
 
+# Install openslide.
+RUN apt-get -qq install -y openslide-tools
+
+# Install build tools for openslide-python
+RUN pip install -U 'setuptools==45.2.0'
+RUN apt-get -qq install -y build-essential
+RUN pip install wheel
+
+RUN pip install openslide-python
+RUN pip install pandas
+
 ADD descriptor.dev.json /app/descriptor.json
 ADD example.py /app/example.py
 ADD api.py /app/api.py
+ADD contours.py /app/contours.py
 
 ENTRYPOINT ["python", "/app/example.py"]
