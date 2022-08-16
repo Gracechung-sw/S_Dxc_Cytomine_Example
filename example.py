@@ -18,10 +18,11 @@ from contours import get_mpp, convert_to_wkt_coordinate, check_clockwise, genera
 SUCCESS_STATUS = ["FINISHED"]
 FAILED_STATUS = ["DOWNLOAD_FAILED", "FAILED"]
 pattern_term_key = {
-    'Pattern3': [260926],
-    'Pattern4': [260926],
+    'Pattern3': [],
+    'Pattern4': [],
     'Pattern5': [260926],
-    'IDC-P': [260926]}  # TODO: 추후 저희가 cytomine에서 정할 term으로 수정 필요합니다.
+    'IDC-P': []}  # TODO: 추후 저희가 cytomine에서 정할 term으로 수정 필요합니다.
+    
 
 _class = ['Pattern3', 'Pattern4', 'Pattern5', 'IDC-P']
 
@@ -132,9 +133,8 @@ def run(cyto_job, parameters):
             slide = openslide.OpenSlide(file_path)
             slide_width, slide_height = slide.dimensions
             mpp, _ = get_mpp(slide)
-            mpp, _ = get_mpp(slide)
+
             _heatmap_to_slide_ratio = 0.2465 * 16 / mpp
-            summary = result["summary"]
             heatmap_dicts = pd.read_pickle('/app/DB-002-015-01_heatmap_dicts.pkl') # result["heatmap"]["contours"][0]
             wkt_list = generate_wkt_list(
                 'heatmap_dict', slide_height, _heatmap_to_slide_ratio, 'None', heatmap_dicts)
