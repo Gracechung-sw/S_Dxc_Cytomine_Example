@@ -12,17 +12,21 @@ from shapely.geometry import Point, box
 import pandas as pd
 
 import cytomine
-from cytomine.models import ImageInstance, ImageInstanceCollection, Job, JobData, Property, Annotation, AnnotationTerm, AnnotationCollection
+from cytomine.models import ImageInstance, ImageInstanceCollection, Job, JobData, Property, Annotation, AnnotationTerm, AnnotationCollection, TermCollection
 from api import get_upload_url, start_analysis, upload_file, get_analysis_status, get_analysis_result
 from contours import get_mpp, convert_to_wkt_coordinate, check_clockwise, generate_wkt_from_heatmap, generate_wkt_list, send_to_cytomine, xml_to_heatmap_dict, generate_wkt_from_openapi
 
 SUCCESS_STATUS = ["FINISHED"]
 FAILED_STATUS = ["DOWNLOAD_FAILED", "FAILED"]
 pattern_term_key = {
-    'Pattern3': [],
-    'Pattern4': [],
-    'Pattern5': [260926],
-    'IDC-P': []}  # TODO: 추후 저희가 cytomine에서 정할 term으로 수정 필요합니다.
+    'Pattern3': [17243],
+    'Pattern4': [17257],
+    'Pattern5': [17285],
+    'IDC-P': [17299],
+    'Invasive': [17311],
+    'DCIS': [17321],
+    'Cancer': [17333]
+    }
     
 
 _class = ['Pattern3', 'Pattern4', 'Pattern5', 'IDC-P']
@@ -71,6 +75,12 @@ def run(cyto_job, parameters):
         # value between 0 and 100 that represent the progress bar displayed in the UI.
         progress = 0
         progress_delta = 100 / nb_images
+
+        # # Get terms
+        # # TODO: delete after get terms
+        # terms = TermCollection().fetch_with_filter("project", project_id)
+        # for term in terms:
+        #     print("Term ID: {} | Name: {} | Color: {}".format(term.id, term.name, term.color))
 
         for (i, image) in enumerate(images):
             image_filie_name = image.instanceFilename
@@ -127,6 +137,7 @@ def run(cyto_job, parameters):
             annotations.fetch()
             print(annotations)
 
+
             # clean up older annotations(contours) rendering:
             for old_anno in annotations:
                 old_anno.delete()
@@ -145,6 +156,7 @@ def run(cyto_job, parameters):
 
             for wkt, pattern in wkt_list:
                 _term = pattern_term_key[pattern]
+                print(_term, pattern)
                 if wkt.is_valid:
                     annotations.append(Annotation(location=str(
                         wkt), id_image=image_id, id_project=project_id, id_term=_term))
@@ -193,4 +205,5 @@ if __name__ == "__main__":
     logging.debug("Command: %s", sys.argv)
 
     with cytomine.CytomineJob.from_cli(sys.argv) as cyto_job:
+
         run(cyto_job, cyto_job.parameters)
