@@ -135,7 +135,6 @@ def run(cyto_job, parameters):
             slide_width, slide_height = slide.dimensions
 
             wkt_list = generate_wkt_from_openapi(result, slide_height)
-            pdb.set_trace() # TODO: delete aftet debugging
 
             # mpp, _ = get_mpp(slide)
 
