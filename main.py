@@ -15,13 +15,13 @@ from contours import generate_wkt_from_openapi
 SUCCESS_STATUS = ["FINISHED"]
 FAILED_STATUS = ["DOWNLOAD_FAILED", "FAILED"]
 PATTERN_TERM_KEY = {
-    'Pattern3': [17243],
-    'Pattern4': [17257],
-    'Pattern5': [17285],
-    'IDC-P': [17299],
-    'Invasive': [17311],
-    'DCIS': [17321],
-    'Cancer': [17333]
+    'Pattern3': [28595],
+    'Pattern4': [28601],
+    'Pattern5': [28609],
+    'IDC-P': [28629],
+    'Invasive': [28637],
+    'DCIS': [28645],
+    'Cancer': [28581]
     }
 
 
