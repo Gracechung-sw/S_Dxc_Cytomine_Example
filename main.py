@@ -4,21 +4,17 @@ import logging
 import shutil
 import time
 import json
-import uuid
-import pdb
 
 import openslide
-from shapely.geometry import Point, box
-import pandas as pd
 
 import cytomine
-from cytomine.models import ImageInstance, ImageInstanceCollection, Job, JobData, Property, Annotation, AnnotationTerm, AnnotationCollection, TermCollection
+from cytomine.models import ImageInstance, ImageInstanceCollection, Job, JobData, Property, Annotation, AnnotationCollection
 from api import get_upload_url, start_analysis, upload_file, get_analysis_status, get_analysis_result
-from contours import get_mpp, convert_to_wkt_coordinate, check_clockwise, generate_wkt_from_heatmap, generate_wkt_list, send_to_cytomine, xml_to_heatmap_dict, generate_wkt_from_openapi
+from contours import generate_wkt_from_openapi
 
 SUCCESS_STATUS = ["FINISHED"]
 FAILED_STATUS = ["DOWNLOAD_FAILED", "FAILED"]
-pattern_term_key = {
+PATTERN_TERM_KEY = {
     'Pattern3': [17243],
     'Pattern4': [17257],
     'Pattern5': [17285],
@@ -27,9 +23,6 @@ pattern_term_key = {
     'DCIS': [17321],
     'Cancer': [17333]
     }
-    
-
-_class = ['Pattern3', 'Pattern4', 'Pattern5', 'IDC-P']
 
 
 def parse_domain_list(s):
@@ -39,30 +32,27 @@ def parse_domain_list(s):
 
 
 def run(cyto_job, parameters):
-    logging.info("Entering run(cyto_job=%s, parameters=%s)",
-                 cyto_job, parameters)
+    logging.info(f"Entering run(cyto_job={cyto_job}, parameters={parameters})")
 
     job = cyto_job.job
     project = cyto_job.project
+    job_id = job.id
     project_id = project.id
-    # I create a working directory that I will delete at the end of this run
-    working_path = os.path.join("tmp", str(job.id))
-    img_download_folder = os.path.join("img", str(project_id))
+    working_path = os.path.join("tmp", str(job_id))
+    img_download_path = os.path.join("img", str(project_id))
     if not os.path.exists(working_path):
-        logging.info("Creating working directory: %s", working_path)
+        logging.info(f"Creating working directory: {working_path}")
         os.makedirs(working_path)
-    if not os.path.exists(img_download_folder):
-        logging.info("Creating img download directory: %s",
-                     img_download_folder)
-        os.makedirs(img_download_folder)
+    if not os.path.exists(img_download_path):
+        logging.info(f"Creating img download directory: {img_download_path}")
+        os.makedirs(img_download_path)
 
     try:
         ai_model_parameter = parameters.ai_model_type
         images_to_analyze = parameters.cytomine_id_images
+        logging.info(f"Display ai_model_parameter {ai_model_parameter}")
 
-        logging.info("Display ai_model_parameter %s", ai_model_parameter)
-
-        # -- Select images to process or Get list of images in my project
+        # -- Select images to process or Get list of images in my project by default
         images = ImageInstanceCollection()
         if images_to_analyze is not None:
             images_id = parse_domain_list(images_to_analyze)
@@ -70,24 +60,18 @@ def run(cyto_job, parameters):
         else:
             images = images.fetch_with_filter("project", project_id)
         nb_images = len(images)
-        logging.info("# images in project: %d", nb_images)
+        logging.info(f"# images to analyze in this project: {nb_images}")
 
         # value between 0 and 100 that represent the progress bar displayed in the UI.
         progress = 0
         progress_delta = 100 / nb_images
-
-        # # Get terms
-        # # TODO: delete after get terms
-        # terms = TermCollection().fetch_with_filter("project", project_id)
-        # for term in terms:
-        #     print("Term ID: {} | Name: {} | Color: {}".format(term.id, term.name, term.color))
 
         for (i, image) in enumerate(images):
             image_filie_name = image.instanceFilename
             image_id = image.id
 
             # -- ai analysis request to open api --
-            file_path = os.path.join(img_download_folder, image_filie_name)
+            file_path = os.path.join(img_download_path, image_filie_name)
             image.download(file_path)
 
             (upload_url, object_id) = get_upload_url(file_path=file_path)
@@ -102,8 +86,8 @@ def run(cyto_job, parameters):
             image_str = f"{image_filie_name} ({i+1}/{nb_images})"
             job.update(
                 status=Job.RUNNING, statusComment=f"progress: {progress} - Analyzing image id {image_id}, {image_str}...", progress=progress)
-            logging.debug("Image id: %d width: %d height: %d resolution: %f magnification: %d filename: %s", image.id,
-                          image.width, image.height, image.resolution, image.magnification, image.filename)
+            # TODO: Check if we use image.height without openslide
+            logging.info(f"Image id: {image_id} width: {image.width} height: {image.height} resolution: {image.resolution} magnification: {image.magnification} filename: {image.filename}")
 
             while True:
                 # TODO: progress UI에 슬라이드마다의 분석 진행 상황을 보여주고, 한 슬라이드가 끝나면 다시 0으로 돌어가도록 하자.
@@ -115,18 +99,16 @@ def run(cyto_job, parameters):
                     raise Exception("Analysis Failed...")
                 else:
                     time.sleep(5)
-            result = get_analysis_result(task_id)
+            analysis_result = get_analysis_result(task_id)
 
             # -- Add properties(aka. summary) to a Cytomine image --
-            summary = result["summary"]
+            analysis_result_summary = analysis_result["summary"]
 
-            for key, value in summary.items():
+            for key, value in analysis_result_summary.items():
                 prop = Property(image, key, value).save()
                 logging.debug(prop)
 
             # -- draw ai analysis result contours as annotation --
-
-            # Print the list of annotations in the given image:
             annotations = AnnotationCollection()
             annotations.image = image_id
             annotations.project = project_id
@@ -135,27 +117,18 @@ def run(cyto_job, parameters):
             annotations.showGIS = True
             annotations.showTerm = True
             annotations.fetch()
-            print(annotations)
 
-
-            # clean up older annotations(contours) rendering:
+            # clean up old contours annotations
             for old_anno in annotations:
                 old_anno.delete()
 
             slide = openslide.OpenSlide(file_path)
             slide_width, slide_height = slide.dimensions
 
-            wkt_list = generate_wkt_from_openapi(result, slide_height)
-
-            # mpp, _ = get_mpp(slide)
-
-            # _heatmap_to_slide_ratio = 0.2465 * 16 / mpp # TODO: 이 magic number는 장기마다 다르므로, 이 값도 받아와야 함. 아니면 내가 if /else로 하드코딩 해 놓던지. 일단은 pnb 기준인 이 값으로 test 해보긴 할 것임. 
-            # heatmap_dicts = pd.read_pickle('/app/DB-002-015-01_heatmap_dicts.pkl') # result["heatmap"]["contours"][0]
-            # wkt_list = generate_wkt_list(
-            #     'heatmap_dict', slide_height, _heatmap_to_slide_ratio, 'None', heatmap_dicts)
+            wkt_list = generate_wkt_from_openapi(analysis_result, slide_height)
 
             for wkt, pattern in wkt_list:
-                _term = pattern_term_key[pattern]
+                _term = PATTERN_TERM_KEY[pattern]
                 print(_term, pattern)
                 if wkt.is_valid:
                     annotations.append(Annotation(location=str(
@@ -165,25 +138,19 @@ def run(cyto_job, parameters):
                         0)), id_image=image_id, id_project=project_id, id_term=_term))
             annotations.save()
 
-            # # Print the list of annotations in the given image:
-            # annotations = AnnotationCollection()
-            # annotations.image = image_id
-            # annotations.fetch()
-            # print(annotations)
-
             # -- save ai analysis result as output.txt file --
-            logging.info("Finished processing image %s", image_filie_name)
+            logging.info(f"Finished processing image {image_filie_name}")
             progress += progress_delta
 
             output_path = os.path.join(
                 working_path, f"{image_filie_name}output.txt")
             f = open(output_path, "w+")
-            f.write(f"Input given was {ai_model_parameter}\r\n")
-            f.write(json.dumps(result))
+            f.write(f"Analysis Model type: {ai_model_parameter}\r\n")
+            f.write(json.dumps(analysis_result))
             f.close()
 
-            # I save a file generated by this run into a "job data" that will be available in the UI.
-            job_data = JobData(job.id, "Generated File",
+            # -- upload output.txt file to cytomine --
+            job_data = JobData(job_id, "Generated File",
                                f"{image_filie_name}output.txt").save()
             job_data.upload(output_path)
 
@@ -193,17 +160,15 @@ def run(cyto_job, parameters):
         print(e)
         job.update(status=Job.FAILED)
     finally:
-        logging.info("Deleting folder %s", working_path)
+        logging.info(f"Deleting folder {working_path}")
         shutil.rmtree(working_path, ignore_errors=True)
-        shutil.rmtree(img_download_folder, ignore_errors=True)
+        shutil.rmtree(img_download_path, ignore_errors=True)
 
         logging.debug("Leaving run()")
         job.update(status=Job.TERMINATED)
 
 
 if __name__ == "__main__":
-    logging.debug("Command: %s", sys.argv)
-
+    logging.debug(f"Command: {sys.argv}")
     with cytomine.CytomineJob.from_cli(sys.argv) as cyto_job:
-
         run(cyto_job, cyto_job.parameters)

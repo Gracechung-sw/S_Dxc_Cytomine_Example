@@ -14,8 +14,8 @@
 
 FROM cytomine/software-python3-base
 
-ADD descriptor.json /app/descriptor.json
-ADD example.py /app/example.py
-ADD api.py /app/api.py
+WORKDIR /app
 
-ENTRYPOINT ["python", "/app/example.py"]
+COPY . .
+
+ENTRYPOINT ["python", "/app/main.py"]

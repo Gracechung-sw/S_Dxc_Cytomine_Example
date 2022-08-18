@@ -25,9 +25,8 @@ RUN pip install wheel
 RUN pip install openslide-python
 RUN pip install pandas
 
-ADD descriptor.dev.json /app/descriptor.json
-ADD example.py /app/example.py
-ADD api.py /app/api.py
-ADD contours.py /app/contours.py
+WORKDIR /app
 
-ENTRYPOINT ["python", "/app/example.py"]
+COPY . .
+
+ENTRYPOINT ["python", "/app/main.py"]

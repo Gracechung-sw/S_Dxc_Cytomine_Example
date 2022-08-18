@@ -1,75 +1,75 @@
 {
-    "name": "Dxc_Cytomine_Dev",
-    "description": "Deepbio Openapi algorithm dev version",
-    "schema-version": "cytomine-0.1",
-    "command-line": "python example.py --cytomine_host [CYTOMINE_HOST] --cytomine_public_key [CYTOMINE_PUBLIC_KEY] --cytomine_private_key [CYTOMINE_PRIVATE_KEY] --cytomine_id_project [CYTOMINE_ID_PROJECT] --cytomine_id_software [CYTOMINE_ID_SOFTWARE] --ai_model_type [AI_MODEL_TYPE] --cytomine_id_images [CYTOMINE_ID_IMAGES]",
-    "inputs": [
-        {
-            "id": "cytomine_host",
-            "name": "Cytomine host",
-            "set-by-server": true,
-            "optional": false,
-            "type": "String",
-            "value-key": "[@ID]",
-            "command-line-flag": "--@id"
-        },
-        {
-            "id": "cytomine_public_key",
-            "name": "Cytomine public key",
-            "set-by-server": true,
-            "optional": false,
-            "type": "String",
-            "value-key": "[@ID]",
-            "command-line-flag": "--@id"
-        },
-        {
-            "id": "cytomine_private_key",
-            "name": "Cytomine private key",
-            "set-by-server": true,
-            "optional": false,
-            "type": "String",
-            "value-key": "[@ID]",
-            "command-line-flag": "--@id"
-        },
-        {
-            "id": "cytomine_id_project",
-            "name": "Cytomine project ID",
-            "set-by-server": true,
-            "optional": false,
-            "type": "Number",
-            "value-key": "[@ID]",
-            "command-line-flag": "--@id"
-        },
-        {
-            "id": "cytomine_id_software",
-            "name": "Cytomine software ID",
-            "set-by-server": true,
-            "optional": false,
-            "type": "Number",
-            "value-key": "[@ID]",
-            "command-line-flag": "--@id"
-        },
-        {
-            "id": "ai_model_type",
-            "name": "AI model type",
-            "description": "Analysis Model type. ProstateNeedleBiopsy_0 | ProstateResection_0 | ProstateTURP_0 | BreastLymphNode_0 | BreastResection_0",
-            "type": "String",
-            "optional": false,
-            "default-value": "ProstateNeedleBiopsy",
-            "value-key": "[@ID]",
-            "command-line-flag": "--@id"
-        },
-        {
-            "id": "cytomine_id_images",
-            "name": "Images to analyze",
-            "description": "The identifiers of the images to analyze. If not specified all image of the project will be processed.",
-            "type": "ListDomain",
-            "optional": true,
-            "value-key": "[@ID]",
-            "command-line-flag": "--@id",
-            "uri": "/api/project/$currentProject$/imageinstance.json",
-            "uri-print-attribute": "instanceFilename",
-            "uri-sort-attribute": "instanceFilename"
-        }
-    ]
+  "name": "Dxc_Cytomine_Dev",
+  "description": "Deepbio Openapi algorithm dev version",
+  "schema-version": "cytomine-0.1",
+  "command-line": "python main.py --cytomine_host [CYTOMINE_HOST] --cytomine_public_key [CYTOMINE_PUBLIC_KEY] --cytomine_private_key [CYTOMINE_PRIVATE_KEY] --cytomine_id_project [CYTOMINE_ID_PROJECT] --cytomine_id_software [CYTOMINE_ID_SOFTWARE] --ai_model_type [AI_MODEL_TYPE] --cytomine_id_images [CYTOMINE_ID_IMAGES]",
+  "inputs": [
+    {
+      "id": "cytomine_host",
+      "name": "Cytomine host",
+      "set-by-server": true,
+      "optional": false,
+      "type": "String",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id"
+    },
+    {
+      "id": "cytomine_public_key",
+      "name": "Cytomine public key",
+      "set-by-server": true,
+      "optional": false,
+      "type": "String",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id"
+    },
+    {
+      "id": "cytomine_private_key",
+      "name": "Cytomine private key",
+      "set-by-server": true,
+      "optional": false,
+      "type": "String",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id"
+    },
+    {
+      "id": "cytomine_id_project",
+      "name": "Cytomine project ID",
+      "set-by-server": true,
+      "optional": false,
+      "type": "Number",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id"
+    },
+    {
+      "id": "cytomine_id_software",
+      "name": "Cytomine software ID",
+      "set-by-server": true,
+      "optional": false,
+      "type": "Number",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id"
+    },
+    {
+      "id": "ai_model_type",
+      "name": "AI model type",
+      "description": "Analysis Model type. ProstateNeedleBiopsy_0 | ProstateResection_0 | ProstateTURP_0 | BreastLymphNode_0 | BreastResection_0",
+      "type": "String",
+      "optional": false,
+      "default-value": "ProstateNeedleBiopsy",
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id"
+    },
+    {
+      "id": "cytomine_id_images",
+      "name": "Images to analyze",
+      "description": "The identifiers of the images to analyze. If not specified all image of the project will be processed.",
+      "type": "ListDomain",
+      "optional": true,
+      "value-key": "[@ID]",
+      "command-line-flag": "--@id",
+      "uri": "/api/project/$currentProject$/imageinstance.json",
+      "uri-print-attribute": "instanceFilename",
+      "uri-sort-attribute": "instanceFilename"
+    }
+  ]
 }
