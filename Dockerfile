@@ -14,6 +14,16 @@
 
 FROM cytomine/software-python3-base
 
+# Install openslide.
+RUN apt-get -qq install -y openslide-tools
+
+# Install build tools for openslide-python
+RUN pip install -U 'setuptools==45.2.0'
+RUN apt-get -qq install -y build-essential
+RUN pip install wheel
+
+RUN pip install openslide-python
+
 WORKDIR /app
 
 COPY . .

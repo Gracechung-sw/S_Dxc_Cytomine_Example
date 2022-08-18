@@ -23,7 +23,6 @@ RUN apt-get -qq install -y build-essential
 RUN pip install wheel
 
 RUN pip install openslide-python
-RUN pip install pandas
 
 WORKDIR /app
 
