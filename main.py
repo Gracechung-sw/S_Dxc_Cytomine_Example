@@ -129,7 +129,6 @@ def run(cyto_job, parameters):
 
             for wkt, pattern in wkt_list:
                 _term = PATTERN_TERM_KEY[pattern]
-                print(_term, pattern)
                 if wkt.is_valid:
                     annotations.append(Annotation(location=str(
                         wkt), id_image=image_id, id_project=project_id, id_term=_term))
