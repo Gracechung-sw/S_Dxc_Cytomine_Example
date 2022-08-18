@@ -155,6 +155,42 @@ def generate_wkt_list(mask_format, slide_height, _heatmap_to_slide_ratio, xml, h
             heatmap_dicts, slide_height, _heatmap_to_slide_ratio)
     return wkt_list
 
+def generate_wkt_from_openapi(openapi_output, slide_height):
+    wkt_list = []
+    min_area = 0
+    if openapi_output["summary"]["score"] == "Benign":
+        return wkt_list
+    contour_list = openapi_output["heatmap"]["contours"]
+    
+    for _contours in contour_list:
+        contours = _contours['contour']
+        pattern = _contours['class']
+        rotate_list = []
+        annotation = []
+        for contour in contours:
+            clock = check_clockwise(contour)
+            if clock == 0:
+                continue
+            elif clock == 1:
+                annotation.append(contour)
+            elif clock == -1:
+                annotation.insert(0, contour)
+            else:
+                print('Error')
+            rotate_list.append(clock)
+        
+        if rotate_list.count(-1) != 1:
+            print('Multipolygon Exists!')
+            pdb.set_trace()
+            continue
+
+        poly = Polygon(
+            shell = convert_to_wkt_coordinate(np.array(annotation[0]), slide_height, 1),
+            holes = [convert_to_wkt_coordinate(np.array(an), slide_height, 1) for an in annotation[1:]
+            if cv2.contourArea(np.array(an)) > min_area])
+        
+        wkt_list.append((poly, pattern))        
+    return wkt_list
 
 def send_to_cytomine(wkt_list, project, map_image):
     with cytomine.Cytomine(host, public_key, private_key) as cobj:

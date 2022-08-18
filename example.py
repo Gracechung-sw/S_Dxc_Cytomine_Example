@@ -5,6 +5,7 @@ import shutil
 import time
 import json
 import uuid
+import pdb
 
 import openslide
 from shapely.geometry import Point, box
@@ -13,7 +14,7 @@ import pandas as pd
 import cytomine
 from cytomine.models import ImageInstance, ImageInstanceCollection, Job, JobData, Property, Annotation, AnnotationTerm, AnnotationCollection
 from api import get_upload_url, start_analysis, upload_file, get_analysis_status, get_analysis_result
-from contours import get_mpp, convert_to_wkt_coordinate, check_clockwise, generate_wkt_from_heatmap, generate_wkt_list, send_to_cytomine, xml_to_heatmap_dict
+from contours import get_mpp, convert_to_wkt_coordinate, check_clockwise, generate_wkt_from_heatmap, generate_wkt_list, send_to_cytomine, xml_to_heatmap_dict, generate_wkt_from_openapi
 
 SUCCESS_STATUS = ["FINISHED"]
 FAILED_STATUS = ["DOWNLOAD_FAILED", "FAILED"]
@@ -132,12 +133,16 @@ def run(cyto_job, parameters):
 
             slide = openslide.OpenSlide(file_path)
             slide_width, slide_height = slide.dimensions
-            mpp, _ = get_mpp(slide)
 
-            _heatmap_to_slide_ratio = 0.2465 * 16 / mpp
-            heatmap_dicts = pd.read_pickle('/app/DB-002-015-01_heatmap_dicts.pkl') # result["heatmap"]["contours"][0]
-            wkt_list = generate_wkt_list(
-                'heatmap_dict', slide_height, _heatmap_to_slide_ratio, 'None', heatmap_dicts)
+            wkt_list = generate_wkt_from_openapi(result, slide_height)
+            pdb.set_trace() # TODO: delete aftet debugging
+
+            # mpp, _ = get_mpp(slide)
+
+            # _heatmap_to_slide_ratio = 0.2465 * 16 / mpp # TODO: 이 magic number는 장기마다 다르므로, 이 값도 받아와야 함. 아니면 내가 if /else로 하드코딩 해 놓던지. 일단은 pnb 기준인 이 값으로 test 해보긴 할 것임. 
+            # heatmap_dicts = pd.read_pickle('/app/DB-002-015-01_heatmap_dicts.pkl') # result["heatmap"]["contours"][0]
+            # wkt_list = generate_wkt_list(
+            #     'heatmap_dict', slide_height, _heatmap_to_slide_ratio, 'None', heatmap_dicts)
 
             for wkt, pattern in wkt_list:
                 _term = pattern_term_key[pattern]
