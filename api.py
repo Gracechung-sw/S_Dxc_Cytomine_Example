@@ -34,13 +34,18 @@ def get_upload_url(file_path):
 #파일 업로드 
 def upload_file(file_path, url):
     file_size = os.path.getsize(file_path)
-    headers = {
-        "Content-Length": str(file_size)
-    }
-    data = open(file=file_path, mode="rb").read()   
-    res = requests.put(url=url, headers=headers, data=data)
-    res.raise_for_status()
-
+    with open(file=file_path, mode='rb') as f:
+        index = 0
+        while True:
+            data = f.read(1024*1024*10)
+            if not data:
+                break
+            headers = {
+                "Content-Length": str(data.__len__()),
+                "Content-Range": f"bytes {index}-{index + data.__len__() - 1}/{file_size}"}
+            index += data.__len__()
+            res = requests.put(url=url, headers=headers, data=data)
+            res.raise_for_status()
 
 #분석 시작 요청
 def start_analysis(source, analysis_type):
