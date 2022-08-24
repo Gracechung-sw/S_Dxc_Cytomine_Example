@@ -50,7 +50,7 @@ def generate_wkt_from_openapi(openapi_output, slide_height):
         
         if rotate_list.count(-1) != 1:
             print('Multipolygon Exists!')
-            pdb.set_trace()
+            # pdb.set_trace()
             continue
 
         poly = Polygon(
