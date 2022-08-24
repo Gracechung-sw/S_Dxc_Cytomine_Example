@@ -37,7 +37,7 @@ def upload_file(file_path, url):
     with open(file=file_path, mode='rb') as f:
         index = 0
         while True:
-            data = f.read(1024*1024*10)
+            data = f.read(1024*1024*100)
             if not data:
                 break
             headers = {
