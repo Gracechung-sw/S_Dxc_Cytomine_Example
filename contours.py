@@ -58,8 +58,7 @@ def generate_wkt_from_openapi(openapi_output, slide_height):
 
         poly = Polygon(
             shell = convert_to_wkt_coordinate(np.array(annotation[0]), slide_height, 1),
-            holes = [convert_to_wkt_coordinate(np.array(an), slide_height, 1) for an in annotation[1:]
-            if cv2.contourArea(np.array(an)) > min_area])
+            holes = [convert_to_wkt_coordinate(np.array(an), slide_height, 1) for an in annotation[1:]])
         
         wkt_list.append((poly, pattern))        
     return wkt_list
