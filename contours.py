@@ -30,10 +30,10 @@ def generate_wkt_from_openapi(openapi_output, slide_height):
     min_area = 0
     if openapi_output["summary"]["score"] == "Benign":
         return wkt_list
-    contour_list = json.loads(openapi_output["heatmap"]["contours"]) #DeepDx-HTTP-API 서비스에서 contour 객체의 contour field type = string
+    contour_list = openapi_output["heatmap"]["contours"] 
     
     for _contours in contour_list:
-        contours = _contours['contour']
+        contours = json.loads(_contours['contour']) #DeepDx-HTTP-API 서비스에서 contour 객체의 contour field type = string
         pattern = _contours['label']
         rotate_list = []
         annotation = []
