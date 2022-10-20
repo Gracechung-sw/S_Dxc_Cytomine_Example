@@ -1,6 +1,7 @@
 import pdb
 import numpy as np
 import cv2
+import json
 from shapely.geometry import Polygon
 
 
@@ -29,11 +30,11 @@ def generate_wkt_from_openapi(openapi_output, slide_height):
     min_area = 0
     if openapi_output["summary"]["score"] == "Benign":
         return wkt_list
-    contour_list = openapi_output["heatmap"]["contours"]
+    contour_list = json.loads(openapi_output["heatmap"]["contours"]) #DeepDx-HTTP-API 서비스에서 contour 객체의 contour field type = string
     
     for _contours in contour_list:
         contours = _contours['contour']
-        pattern = _contours['class']
+        pattern = _contours['label']
         rotate_list = []
         annotation = []
         for contour in contours:
